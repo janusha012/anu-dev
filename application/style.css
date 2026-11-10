@@ -1,0 +1,112 @@
+/* Reset default browser spacing */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Full webpage design */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #e0f2fe, #ede9fe);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+/* Header */
+header {
+    background: linear-gradient(90deg, #172554, #4c1d95);
+    color: white;
+    padding: 18px;
+}
+
+header h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+header p {
+    font-size: 15px;
+}
+
+/* Main section */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+}
+
+.container {
+    background: white;
+    width: 90%;
+    max-width: 650px;
+    padding: 18px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.container h2 {
+    color: #172554;
+    margin-bottom: 12px;
+    font-size: 23px;
+}
+
+/* Peacock image */
+.peacock-image {
+    width: 100%;
+    max-width: 280px;
+    height: 190px;
+    object-fit: contain;
+    border-radius: 12px;
+    margin: 8px auto;
+}
+
+.container p {
+    color: #334155;
+    font-size: 15px;
+    margin: 8px 0;
+}
+
+/* Button */
+button {
+    background: linear-gradient(90deg, #4c1d95, #1e3a8a);
+    color: white;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 7px;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+button:hover {
+    background: linear-gradient(90deg, #6d28d9, #1e3a8a);
+}
+
+/* Footer */
+footer {
+    background: #172554;
+    color: white;
+    padding: 13px;
+    font-size: 14px;
+}
+
+/* Smaller screens */
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 22px;
+    }
+
+    .container {
+        width: 100%;
+    }
+
+    .peacock-image {
+        max-width: 220px;
+        height: 150px;
+    }
+}
