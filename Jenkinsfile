@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -8,6 +9,10 @@ pipeline {
     environment {
         IMAGE_NAME = 'anu-devsecops'
         SONAR_PROJECT_KEY = 'anu-devsecops'
+        AWS_REGION = 'ap-south-1'
+        ECR_REPOSITORY = 'eks-anu'
+        EKS_CLUSTER_NAME = 'anu-eks-cluster'
+        ECR_URI = '179260491954.dkr.ecr.ap-south-1.amazonaws.com/eks-anu'
     }
 
     stages {
@@ -21,10 +26,13 @@ pipeline {
 
         stage('Application Validation') {
             steps {
-                sh 'test -f application/index.html'
-                sh 'test -f application/style.css'
-                sh 'test -f application/script.js'
-                echo 'Application files validated successfully'
+                sh '''
+                    test -f application/index.html
+                    test -f application/style.css
+                    test -f application/script.js
+                    test -f deployment.yaml
+                    test -f service.yaml
+                '''
             }
         }
 
@@ -48,7 +56,6 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh 'docker build -t ${IMAGE_NAME}:latest .'
-                echo 'Docker image built successfully'
             }
         }
 
@@ -58,22 +65,54 @@ pipeline {
             }
         }
 
+        stage('ECR Login and Push') {
+            steps {
+                sh '''
+                    aws ecr get-login-password --region ${AWS_REGION} |
+                    docker login --username AWS --password-stdin ${ECR_URI%/*}
+
+                    docker tag ${IMAGE_NAME}:latest ${ECR_URI}:latest
+
+                    docker push ${ECR_URI}:latest
+                '''
+            }
+        }
+
+        stage('EKS Deployment') {
+            steps {
+                sh '''
+                    aws eks update-kubeconfig \
+                      --region ${AWS_REGION} \
+                      --name ${EKS_CLUSTER_NAME}
+
+                    kubectl apply -f deployment.yaml
+                    kubectl apply -f service.yaml
+
+                    kubectl rollout status deployment/anu-devsecops-app \
+                      --timeout=300s
+                '''
+            }
+        }
+
         stage('Terraform Validation') {
             steps {
-                sh 'terraform -chdir=terraform fmt -check -recursive'
-                sh 'terraform -chdir=terraform init -backend=false'
-                sh 'terraform -chdir=terraform validate'
+                sh '''
+                    terraform -chdir=terraform fmt -check -recursive
+                    terraform -chdir=terraform init -backend=false
+                    terraform -chdir=terraform validate
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'DevSecOps pipeline completed successfully'
+            echo 'DevSecOps CI/CD pipeline completed successfully!'
         }
 
         failure {
-            echo 'Pipeline failed. Please check the Jenkins console output.'
+            echo 'Pipeline failed. Check Jenkins console output.'
         }
     }
 }
+

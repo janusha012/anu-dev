@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anu-devsecops-app
+  labels:
+    app: anu-devsecops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: anu-devsecops
+  template:
+    metadata:
+      labels:
+        app: anu-devsecops
+    spec:
+      containers:
+        - name: anu-devsecops-container
+          image: 179260491954.dkr.ecr.ap-south-1.amazonaws.com/eks-anu:latest
+          ports:
+            - containerPort: 80
